@@ -1,10 +1,12 @@
-import React from 'react';
-import './App.css';
-import Home from './pages/Home';
+import { PropsWithChildren } from "react";
+import { useTokenRefresher } from "./hooks/useTokenRefresher";
 
-function App() {
+function App(props: PropsWithChildren) {
+  useTokenRefresher();
   return (
-    <Home />
+    <>
+    {props.children}
+    </>
   );
 }
 

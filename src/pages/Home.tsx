@@ -1,7 +1,5 @@
-import React from 'react';
-import Header from '../components/Header/Header';
+
 import HeroSection from '../components/HeroSection/HeroSection';
-import Footer from '../components/Footer/Footer';
 import FeatureCard from '../components/FeatureCard/FeatureCard';
 import TestimonialSection from '../components/TestimonialSection/TestimonialSection';
 import './Home.scss';
@@ -12,7 +10,6 @@ const Home = () => {
 
     return (
         <div className="home-page">
-            <Header />
             <div style={{ marginTop: '3rem' }}>
                 <HeroSection />
             </div>
@@ -30,7 +27,6 @@ const Home = () => {
                 </div>
             </motion.div>
             <TestimonialSection />
-            <Footer />
         </div>
     );
 };

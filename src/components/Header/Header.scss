@@ -47,4 +47,30 @@
 .header-signin:hover {
   background: #8f5cf7;
 }
+
+.link {
+    text-decoration: none;
+    color: #fff
+}
+
+.header-authenticated {
+    display: flex;
+    gap: 20px;
+  }
+  
+  .header-button {
+    background-color: #a678e4;
+    color: #fff;
+    padding: 10px 24px;
+    border: none;
+    border-radius: 24px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .header-button .link {
+    color: white;
+    text-decoration: none;
+  }
   

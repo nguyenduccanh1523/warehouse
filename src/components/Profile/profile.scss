@@ -1,0 +1,215 @@
+.profile-wrapper {
+  display: flex;
+  min-height: 100vh;
+  background: #fafafa;
+}
+
+.profile-sidebar {
+  width: 220px;
+  background: #e5e5e5;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 2rem 0 0 0;
+  min-height: 100vh;
+}
+.profile-logo {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: 2rem;
+  margin-bottom: 2.5rem;
+}
+.profile-logo .dot1 {
+  width: 12px;
+  height: 12px;
+  background: #a678e4;
+  border-radius: 50%;
+  display: inline-block;
+}
+.profile-logo .dot2 {
+  width: 18px;
+  height: 18px;
+  background: #e0d7fa;
+  border-radius: 50%;
+  display: inline-block;
+}
+.profile-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  margin-left: 2rem;
+}
+.profile-nav a {
+  color: #2d2e46;
+  text-decoration: none;
+  font-size: 1.1rem;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+.profile-nav a.active,
+.profile-nav a:hover {
+  color: #a678e4;
+}
+
+.profile-main {
+  flex: 1;
+  padding: 3rem 2rem 2rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.profile-header-row {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+}
+.add-btn {
+  background: #a678e4;
+  color: #fff;
+  border: none;
+  border-radius: 2rem;
+  padding: 0.9rem 3.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(80, 80, 80, 0.08);
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.add-btn:hover {
+  background: #8f5cf7;
+  box-shadow: 0 4px 16px rgba(80, 80, 80, 0.13);
+}
+.profile-filters {
+  display: flex;
+  gap: 1rem;
+}
+.profile-filters input {
+  border: 1px solid #d1d1d1;
+  border-radius: 0.7rem;
+  padding: 0.7rem 1.2rem;
+  font-size: 1rem;
+  outline: none;
+  min-width: 180px;
+  background: #fff;
+  transition: border 0.2s;
+}
+.profile-filters input:focus {
+  border: 1.5px solid #a678e4;
+}
+.profile-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 2px 12px rgba(80, 80, 80, 0.07);
+}
+.profile-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 700px;
+}
+.profile-table th, .profile-table td {
+  padding: 0.9rem 1.2rem;
+  border-bottom: 1px solid #e5e5e5;
+  text-align: left;
+  font-size: 1rem;
+}
+.profile-table th {
+  background: #e5e5e5;
+  font-weight: 700;
+}
+.profile-table tr:last-child td {
+  border-bottom: none;
+}
+.profile-actions {
+  display: flex;
+  gap: 0.7rem;
+}
+.icon-btn {
+  background: none;
+  border: none;
+  padding: 0.2rem;
+  cursor: pointer;
+  border-radius: 0.5rem;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+}
+.icon-btn:hover {
+  background: #f2eaff;
+}
+.profile-pagination {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  align-items: center;
+  justify-content: flex-end;
+}
+.profile-pagination button {
+  background: #e5e5e5;
+  border: none;
+  border-radius: 0.6rem;
+  padding: 0.5rem 1.1rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #232360;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.profile-pagination button.active, .profile-pagination button:hover {
+  background: #a678e4;
+  color: #fff;
+}
+.profile-pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 900px) {
+  .profile-wrapper {
+    flex-direction: column;
+  }
+  .profile-sidebar {
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    padding: 1rem 0 1rem 1rem;
+    min-height: unset;
+  }
+  .profile-logo {
+    margin: 0 2rem 0 0;
+  }
+  .profile-nav {
+    flex-direction: row;
+    gap: 2rem;
+    margin: 0;
+  }
+  .profile-main {
+    padding: 2rem 0.5rem 1rem 0.5rem;
+  }
+  .profile-table-wrapper {
+    border-radius: 0.7rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .profile-main {
+    padding: 1rem 0.2rem;
+  }
+  .profile-header-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+  .profile-filters {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .profile-table {
+    min-width: 480px;
+    font-size: 0.95rem;
+  }
+}

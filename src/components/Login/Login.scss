@@ -1,0 +1,112 @@
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  background: #fff;
+  position: relative;
+}
+
+.login-logo {
+  margin-top: 40px;
+  margin-left: 60px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  .dot1 {
+    width: 16px;
+    height: 16px;
+    background: #a678e4;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .dot2 {
+    width: 16px;
+    height: 32px;
+    background: #e678b8;
+    border-radius: 10px;
+    display: inline-block;
+  }
+}
+
+.login-form {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: 320px;
+  max-width: 90vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: transparent;
+
+  h1 {
+    font-size: 2.5rem;
+    margin-bottom: 32px;
+    font-weight: 400;
+  }
+
+  label {
+    align-self: flex-start;
+    margin-bottom: 6px;
+    font-size: 1rem;
+  }
+
+  input {
+    width: 300px;
+    max-width: 80vw;
+    padding: 10px 12px;
+    margin-bottom: 24px;
+    border: 1px solid #888;
+    border-radius: 4px;
+    font-size: 1rem;
+    outline: none;
+    transition: border 0.2s;
+    &:focus {
+      border: 1.5px solid #a678e4;
+    }
+  }
+
+  button {
+    width: 300px;
+    max-width: 80vw;
+    padding: 12px 0;
+    background: #a678e4;
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background 0.2s;
+    &:hover {
+      background: #8d5fd3;
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .login-logo {
+    margin-top: 24px;
+    margin-left: 20px;
+    .dot1, .dot2 {
+      width: 12px;
+      height: 12px;
+    }
+    .dot2 {
+      height: 24px;
+    }
+  }
+  .login-form {
+    min-width: 220px;
+    h1 {
+      font-size: 2rem;
+    }
+    input, button {
+      width: 180px;
+      font-size: 0.95rem;
+    }
+  }
+}
