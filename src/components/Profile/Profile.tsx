@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import 'antd/dist/reset.css';
 import './profile.scss';
-import { getPosts, createPost, updatePost, deletePost } from '../../services/post.api';
+import { getPosts, createPost, updatePost, deletePost, getTags } from '../../services/post.api';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../../redux/authSlice';
-import { Modal, message } from 'antd';
+import { Modal, message, Select } from 'antd';
 import ProfileModal from './ProfileModal';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
@@ -31,6 +31,7 @@ const Profile = () => {
     const navigate = useNavigate();
     const [modalOpen, setModalOpen] = useState(false);
     const [editData, setEditData] = useState<Post | null>(null);
+    const [tagOptions, setTagOptions] = useState<string[]>([]);
 
     const fetchData = async () => {
         try {
@@ -45,6 +46,13 @@ const Profile = () => {
     useEffect(() => {
         fetchData();
     }, [page, searchTitle, searchTags]);
+
+    useEffect(() => {
+        // Lấy danh sách tag khi load component
+        getTags().then((tags) => {
+            setTagOptions(tags || []);
+        });
+    }, []);
 
     const handlePageChange = (newPage: number) => {
         if (newPage >= 1 && newPage <= totalPages) setPage(newPage);
@@ -134,11 +142,14 @@ const Profile = () => {
                             value={searchTitle}
                             onChange={e => setSearchTitle(e.target.value)}
                         />
-                        <input
-                            type="text"
-                            placeholder="Tags"
-                            value={searchTags}
-                            onChange={e => setSearchTags(e.target.value)}
+                        <Select
+                            mode="multiple"
+                            allowClear
+                            style={{ minWidth: 200 }}
+                            placeholder="Chọn tag để tìm kiếm"
+                            value={searchTags ? searchTags.split(',') : []}
+                            onChange={values => setSearchTags(values.join(','))}
+                            options={tagOptions.map(tag => ({ label: tag, value: tag }))}
                         />
                     </div>
                 </div>

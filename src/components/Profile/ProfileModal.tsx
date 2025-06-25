@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
-import { Modal, Form, Input } from 'antd';
+import { Modal, Form, Input, Select } from 'antd';
+import { getTags } from '../../services/post.api';
 
 export interface ProfileModalProps {
   open: boolean;
@@ -10,11 +11,15 @@ export interface ProfileModalProps {
 
 const ProfileModal: React.FC<ProfileModalProps> = ({ open, onOk, onCancel, initialValues }) => {
   const [form] = Form.useForm();
-
+  const [tagOptions, setTagOptions] = React.useState<string[]>([]);
 
   useEffect(() => {
     if (open) {
       form.setFieldsValue(initialValues || { title: '', description: '', tags: '' });
+      // Lấy danh sách tag khi mở modal
+      getTags().then((tags) => {
+        setTagOptions(tags || []);
+      });
     }
   }, [open, initialValues, form]);
 
@@ -68,10 +73,16 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ open, onOk, onCancel, initi
           <Input.TextArea placeholder="Nhập mô tả" rows={3} />
         </Form.Item>
         <Form.Item
-          label="Tags (phân cách bằng dấu phẩy)"
+          label="Tags (chọn nhiều hoặc nhập mới, phân cách bằng dấu phẩy)"
           name="tags"
         >
-          <Input placeholder="tag1, tag2, ..." />
+          <Select
+            mode="multiple"
+            allowClear
+            placeholder="Chọn tag hoặc nhập mới"
+            options={tagOptions.map(tag => ({ label: tag, value: tag }))}
+            tokenSeparators={[',']}
+          />
         </Form.Item>
       </Form>
     </Modal>

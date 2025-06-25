@@ -25,3 +25,8 @@ export const deletePost = async (id: string) => {
   const res = await axiosInstance.delete(`/posts/${id}`);
   return res.data;
 };
+
+export const getTags = async () => {
+    const res = await axiosInstance.get('/posts/tags');
+    return res.data;
+  };
