@@ -1,0 +1,88 @@
+/* FeatureCard styles */
+.featurecard-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  border-radius: 2rem;
+  box-shadow: 0 4px 24px 0 rgba(80, 80, 80, 0.07);
+  padding: 2.5rem 2.5rem 2.5rem 2rem;
+  min-width: 320px;
+  max-width: 420px;
+  flex: 1 1 320px;
+  min-height: 240px;
+  background: inherit;
+  transition: transform 0.3s, box-shadow 0.3s;
+  position: relative;
+  margin: 1rem 0.5rem;
+}
+
+.featurecard-container:hover {
+  transform: translateY(-8px) scale(1.03);
+  box-shadow: 0 8px 32px 0 rgba(80, 80, 80, 0.13);
+}
+
+.featurecard-img {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  margin-right: 2rem;
+  flex-shrink: 0;
+}
+
+.featurecard-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex: 1;
+}
+
+.featurecard-content h3 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #232360;
+  margin-bottom: 1rem;
+}
+
+.featurecard-content p {
+  color: #6b6b6b;
+  font-size: 1rem;
+  margin-bottom: 2rem;
+}
+
+.featurecard-link {
+  color: #6f4ef2;
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.featurecard-link span {
+  font-size: 1.2rem;
+  transition: transform 0.2s;
+}
+
+.featurecard-link:hover span {
+  transform: translateX(4px);
+}
+
+@media (max-width: 900px) {
+  .featurecard-container {
+    flex-direction: column;
+    align-items: center;
+    min-width: 260px;
+    max-width: 100%;
+    padding: 2rem 1rem;
+  }
+  .featurecard-img {
+    margin-right: 0;
+    margin-bottom: 1.5rem;
+  }
+  .featurecard-content {
+    align-items: center;
+    text-align: center;
+  }
+}
+  

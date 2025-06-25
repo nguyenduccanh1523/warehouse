@@ -1,0 +1,58 @@
+.home-page {
+    display: flex;
+    flex-direction: column;
+    gap: 4rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  
+    @media (max-width: 768px) {
+      padding: 0.5rem 0 0 0;
+      gap: 1rem;
+    }
+  
+    @media (min-width: 1200px) {
+      padding: 2rem 0 0 0;
+    }
+  }
+
+
+.features-title,
+.testimonial-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #232360;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.features-desc {
+  color: #6b6b6b;
+  font-size: 1.1rem;
+  text-align: center;
+  margin: 0 auto;
+  justify-content: center;
+  margin-bottom: 2.5rem;
+  max-width: 600px;
+}
+
+.features-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  justify-content: center;
+  width: 100%;
+}
+
+@media (max-width: 900px) {
+  .home-page {
+    max-width: 100%;
+    padding: 0 1rem;
+  }
+  .features-list {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+
+
