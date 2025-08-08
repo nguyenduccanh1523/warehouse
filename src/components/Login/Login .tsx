@@ -4,9 +4,11 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { login } from "../../services/auth.api";
 import { loginSuccess } from "../../redux/authSlice";
+import { PassThrough } from "stream";
 
 const Login = () => {
     const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -14,7 +16,7 @@ const Login = () => {
         e.preventDefault();
 
         try {
-            const { accessToken, refreshToken } = await login(username);
+            const { accessToken, refreshToken } = await login(username, password);
             dispatch(loginSuccess({ accessToken, refreshToken }));
             navigate("/")
         } catch (err) {
@@ -41,7 +43,17 @@ const Login = () => {
                     type="text"
                     value={username}
                     onChange={e => setUsername(e.target.value)}
+                    placeholder="Username"
                     autoComplete="off"
+                />
+                <label htmlFor="password">Password</label>
+                <input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    placeholder="Password"
+                    autoComplete="current-password"
                 />
                 <button type="submit">Sign In</button>
             </form>
