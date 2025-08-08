@@ -19,7 +19,7 @@ const processQueue = (error: any, token: string | null = null) => {
 };
 
 const axiosInstance = axios.create({
-    baseURL: 'https://api-test-web.agiletech.vn',
+    baseURL: 'https://be-warehouse-production.up.railway.app/api',
     headers: {
         'Content-Type': 'application/json',
     },
