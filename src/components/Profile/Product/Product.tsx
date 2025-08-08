@@ -1,23 +1,28 @@
 import React, { useEffect, useState } from "react";
 import "antd/dist/reset.css";
-import "./profile.scss";
+import "../profile.scss";
 import {
-  getCustomers,
-  createCustomer,
-  updateCustomer,
-  deleteCustomer,
-} from "../../services/customer.api";
+  getProducts,
+  createProduct,
+  updateProduct,
+  deleteProduct,
+} from "../../../services/product.api";
+import { getSuppliers } from "../../../services/supplier.api";
 import { message, Select } from "antd";
-import ProfileModal from "./ProfileModal";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
+import ProductModal from "./ProductModal";
 
-interface Customer {
+interface Product {
   id: string;
   name: string;
-  email: string;
-  phone: string;
-  address: string;
+  quantity: number;
+  price: number;
+  supplier_id: string;
+  supplier?: {
+    id: string;
+    name: string;
+  };
 }
 
 const PAGE_SIZE = 10;
@@ -29,37 +34,50 @@ const sortOptions = [
   { label: "ID ↓", value: "-id" },
   { label: "Name ↑", value: "name" },
   { label: "Name ↓", value: "-name" },
-  { label: "Email ↑", value: "email" },
-  { label: "Email ↓", value: "-email" },
-  { label: "Address ↑", value: "address" },
-  { label: "Address ↓", value: "-address" },
+  { label: "Quantity ↑", value: "quantity" },
+  { label: "Quantity ↓", value: "-quantity" },
+  { label: "Price ↑", value: "price" },
+  { label: "Price ↓", value: "-price" },
 ];
 
-const Profile = () => {
+const Product = () => {
   const [total, setTotalPages] = useState(0);
   const [skip, setSkip] = useState(0);
   const [limit, setLimit] = useState(PAGE_SIZE);
   const [q, setQ] = useState("");
   const [sort, setSort] = useState("");
-  const [data, setData] = useState<Customer[]>([]);
+  const [data, setData] = useState<Product[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = Math.ceil(total / limit);
   const [modalOpen, setModalOpen] = useState(false);
-  const [editData, setEditData] = useState<Customer | null>(null);
+  const [editData, setEditData] = useState<Product | null>(null);
+  const [suppliers, setSuppliers] = useState<{ id: string; name: string }[]>([]);
+  const [supplierId, setSupplierId] = useState<string | undefined>(undefined);
 
   const fetchData = async () => {
     try {
-      const result = await getCustomers(limit, skip, q, sort);
+      const result = await getProducts(limit, skip, q, sort, supplierId);
       setData(result.data || []);
       setTotalPages(result.total || 1);
     } catch (error) {
-      console.error("Error fetching customers:", error);
+      console.error("Error fetching products:", error);
+    }
+  };
+
+  const fetchSuppliers = async () => {
+    try {
+      const result = await getSuppliers();
+      setSuppliers(result.data || []);
+    }
+    catch (error) {
+      console.error("Error fetching suppliers:", error);
     }
   };
 
   useEffect(() => {
     fetchData();
-  }, [limit, skip, q, sort]);
+    fetchSuppliers();
+  }, [limit, skip, q, sort, supplierId]);
 
   const handlePageChange = (newPage: number) => {
     const newSkip = (newPage - 1) * limit;
@@ -68,21 +86,20 @@ const Profile = () => {
     fetchData();
   };
 
-
   const handleAddNew = () => {
     setEditData(null);
     setModalOpen(true);
   };
 
-  const handleEdit = (customer: Customer) => {
-    setEditData(customer);
+  const handleEdit = (product: Product) => {
+    setEditData(product);
     setModalOpen(true);
   };
 
-  const handleDelete = (customer: Customer) => {
+  const handleDelete = (product: Product) => {
     MySwal.fire({
-      title: "Bạn có chắc muốn xóa khách hàng này?",
-      text: customer.name,
+      title: "Bạn có chắc muốn xóa sản phẩm này?",
+      text: product.name,
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Xóa",
@@ -91,7 +108,7 @@ const Profile = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await deleteCustomer(customer.id);
+          await deleteProduct(product.id);
           MySwal.fire("Đã xóa!", "", "success");
           fetchData();
         } catch {
@@ -102,13 +119,12 @@ const Profile = () => {
   };
 
   const handleModalOk = async (values: any) => {
-    console.log("c", values);
     try {
       if (editData) {
-        await updateCustomer(editData.id, values);
+        await updateProduct(editData.id, values);
         message.success("Cập nhật thành công!");
       } else {
-        await createCustomer(values);
+        await createProduct(values);
         message.success("Tạo mới thành công!");
       }
       setModalOpen(false);
@@ -146,6 +162,17 @@ const Profile = () => {
             />
             <Select
               allowClear
+              style={{ minWidth: 200 }}
+              placeholder="Lọc theo nhà cung cấp"
+              value={supplierId || undefined}
+              onChange={(value) => setSupplierId(value)}
+              options={suppliers.map((supplier) => ({
+                label: supplier.name,
+                value: supplier.id,
+              }))}
+            />
+            <Select
+              allowClear
               style={{ minWidth: 100 }}
               placeholder="Số lượng"
               value={limit}
@@ -167,9 +194,9 @@ const Profile = () => {
               <tr>
                 <th>ID</th>
                 <th>Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Address</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Supplier</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -185,9 +212,9 @@ const Profile = () => {
                   <tr key={item.id || idx}>
                     <td>{item.id}</td>
                     <td>{item.name}</td>
-                    <td>{item.email}</td>
-                    <td>{item.phone}</td>
-                    <td>{item.address}</td>
+                    <td>{item.quantity}</td>
+                    <td>{item.price}</td>
+                    <td>{item.supplier?.name}</td>
                     <td>
                       <div className="profile-actions">
                         <button
@@ -272,7 +299,7 @@ const Profile = () => {
           </button>
         </div>
       </main>
-      <ProfileModal
+      <ProductModal
         open={modalOpen}
         onOk={handleModalOk}
         onCancel={handleModalCancel}
@@ -282,4 +309,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default Product;

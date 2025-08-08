@@ -25,7 +25,7 @@ const Header = () => {
             {accessToken ? (
                 <div className="header-authenticated">
                     <button className="header-button">
-                        <Link to="/profile" className="link">Profile</Link>
+                        <Link to="/customers" className="link">Profile</Link>
                     </button>
                     <button className="header-button" onClick={handleLogout}>
                         Logout

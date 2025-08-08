@@ -1,21 +1,20 @@
 import React, { useEffect, useState } from "react";
 import "antd/dist/reset.css";
-import "./profile.scss";
+import "../profile.scss";
 import {
-  getCustomers,
-  createCustomer,
-  updateCustomer,
-  deleteCustomer,
-} from "../../services/customer.api";
+  getSuppliers,
+  createSupplier,
+  updateSupplier,
+  deleteSupplier,
+} from "../../../services/supplier.api";
 import { message, Select } from "antd";
-import ProfileModal from "./ProfileModal";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
+import SupplierModal from "./SupplierModal";
 
-interface Customer {
+interface Supplier {
   id: string;
   name: string;
-  email: string;
   phone: string;
   address: string;
 }
@@ -29,31 +28,29 @@ const sortOptions = [
   { label: "ID ↓", value: "-id" },
   { label: "Name ↑", value: "name" },
   { label: "Name ↓", value: "-name" },
-  { label: "Email ↑", value: "email" },
-  { label: "Email ↓", value: "-email" },
   { label: "Address ↑", value: "address" },
   { label: "Address ↓", value: "-address" },
 ];
 
-const Profile = () => {
+const Supplier = () => {
   const [total, setTotalPages] = useState(0);
   const [skip, setSkip] = useState(0);
   const [limit, setLimit] = useState(PAGE_SIZE);
   const [q, setQ] = useState("");
   const [sort, setSort] = useState("");
-  const [data, setData] = useState<Customer[]>([]);
+  const [data, setData] = useState<Supplier[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = Math.ceil(total / limit);
   const [modalOpen, setModalOpen] = useState(false);
-  const [editData, setEditData] = useState<Customer | null>(null);
+  const [editData, setEditData] = useState<Supplier | null>(null);
 
   const fetchData = async () => {
     try {
-      const result = await getCustomers(limit, skip, q, sort);
+      const result = await getSuppliers(limit, skip, q, sort);
       setData(result.data || []);
       setTotalPages(result.total || 1);
     } catch (error) {
-      console.error("Error fetching customers:", error);
+      console.error("Error fetching suppliers:", error);
     }
   };
 
@@ -68,21 +65,20 @@ const Profile = () => {
     fetchData();
   };
 
-
   const handleAddNew = () => {
     setEditData(null);
     setModalOpen(true);
   };
 
-  const handleEdit = (customer: Customer) => {
-    setEditData(customer);
+  const handleEdit = (supplier: Supplier) => {
+    setEditData(supplier);
     setModalOpen(true);
   };
 
-  const handleDelete = (customer: Customer) => {
+  const handleDelete = (supplier: Supplier) => {
     MySwal.fire({
-      title: "Bạn có chắc muốn xóa khách hàng này?",
-      text: customer.name,
+      title: "Bạn có chắc muốn xóa nhà cung cấp này?",
+      text: supplier.name,
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Xóa",
@@ -91,7 +87,7 @@ const Profile = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await deleteCustomer(customer.id);
+          await deleteSupplier(supplier.id);
           MySwal.fire("Đã xóa!", "", "success");
           fetchData();
         } catch {
@@ -105,10 +101,10 @@ const Profile = () => {
     console.log("c", values);
     try {
       if (editData) {
-        await updateCustomer(editData.id, values);
+        await updateSupplier(editData.id, values);
         message.success("Cập nhật thành công!");
       } else {
-        await createCustomer(values);
+        await createSupplier(values);
         message.success("Tạo mới thành công!");
       }
       setModalOpen(false);
@@ -167,7 +163,6 @@ const Profile = () => {
               <tr>
                 <th>ID</th>
                 <th>Name</th>
-                <th>Email</th>
                 <th>Phone</th>
                 <th>Address</th>
                 <th>Actions</th>
@@ -185,7 +180,6 @@ const Profile = () => {
                   <tr key={item.id || idx}>
                     <td>{item.id}</td>
                     <td>{item.name}</td>
-                    <td>{item.email}</td>
                     <td>{item.phone}</td>
                     <td>{item.address}</td>
                     <td>
@@ -272,7 +266,7 @@ const Profile = () => {
           </button>
         </div>
       </main>
-      <ProfileModal
+      <SupplierModal
         open={modalOpen}
         onOk={handleModalOk}
         onCancel={handleModalCancel}
@@ -282,4 +276,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default Supplier;
