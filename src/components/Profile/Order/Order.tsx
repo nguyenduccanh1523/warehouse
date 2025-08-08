@@ -1,23 +1,27 @@
 import React, { useEffect, useState } from "react";
 import "antd/dist/reset.css";
-import "./profile.scss";
+import "../profile.scss";
 import {
-  getCustomers,
-  createCustomer,
-  updateCustomer,
-  deleteCustomer,
-} from "../../services/customer.api";
+  getOrders,
+  createOrder,
+  updateOrder,
+  deleteOrder,
+} from "../../../services/order.api";
+import { getCustomers } from "../../../services/customer.api";
 import { message, Select } from "antd";
-import ProfileModal from "./ProfileModal";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
+import OrderModal from "./OrderModal";
 
-interface Customer {
+interface Order {
   id: string;
-  name: string;
-  email: string;
-  phone: string;
-  address: string;
+  customer_id: string;
+  order_date: string;
+  total_amount: number;
+  customer?: {
+    id: string;
+    name: string;
+  };
 }
 
 const PAGE_SIZE = 10;
@@ -27,39 +31,50 @@ const MySwal = withReactContent(Swal);
 const sortOptions = [
   { label: "ID ↑", value: "id" },
   { label: "ID ↓", value: "-id" },
-  { label: "Name ↑", value: "name" },
-  { label: "Name ↓", value: "-name" },
-  { label: "Email ↑", value: "email" },
-  { label: "Email ↓", value: "-email" },
-  { label: "Address ↑", value: "address" },
-  { label: "Address ↓", value: "-address" },
+  { label: "Order Date ↑", value: "order_date" },
+  { label: "Order Date ↓", value: "-order_date" },
+  { label: "Total Amount ↑", value: "total_amount" },
+  { label: "Total Amount ↓", value: "-total_amount" },
 ];
 
-const Profile = () => {
+const Order = () => {
   const [total, setTotalPages] = useState(0);
   const [skip, setSkip] = useState(0);
   const [limit, setLimit] = useState(PAGE_SIZE);
-  const [q, setQ] = useState("");
+  const [date, setDate] = useState("");
   const [sort, setSort] = useState("");
-  const [data, setData] = useState<Customer[]>([]);
+  const [data, setData] = useState<Order[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = Math.ceil(total / limit);
   const [modalOpen, setModalOpen] = useState(false);
-  const [editData, setEditData] = useState<Customer | null>(null);
+  const [editData, setEditData] = useState<Order | null>(null);
+  const [customers, setCustomers] = useState<{ id: string; name: string }[]>([]);
+  const [customerId, setCustomerId] = useState<string | undefined>(undefined);
 
   const fetchData = async () => {
     try {
-      const result = await getCustomers(limit, skip, q, sort);
+      const result = await getOrders(limit, skip, date, sort, customerId);
       setData(result.data || []);
       setTotalPages(result.total || 1);
     } catch (error) {
+      console.error("Error fetching orders:", error);
+    }
+  };
+
+  const fetchCustomers = async () => {
+    try {
+      const result = await getCustomers();
+      setCustomers(result.data || []);
+    }
+    catch (error) {
       console.error("Error fetching customers:", error);
     }
   };
 
   useEffect(() => {
     fetchData();
-  }, [limit, skip, q, sort]);
+    fetchCustomers();
+  }, [limit, skip, date, sort, customerId]);
 
   const handlePageChange = (newPage: number) => {
     const newSkip = (newPage - 1) * limit;
@@ -68,21 +83,20 @@ const Profile = () => {
     fetchData();
   };
 
-
   const handleAddNew = () => {
     setEditData(null);
     setModalOpen(true);
   };
 
-  const handleEdit = (customer: Customer) => {
-    setEditData(customer);
+  const handleEdit = (order: Order) => {
+    setEditData(order);
     setModalOpen(true);
   };
 
-  const handleDelete = (customer: Customer) => {
+  const handleDelete = (order: Order) => {
     MySwal.fire({
-      title: "Bạn có chắc muốn xóa khách hàng này?",
-      text: customer.name,
+      title: "Bạn có chắc muốn xóa đơn hàng này?",
+      text: order.id,
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Xóa",
@@ -91,7 +105,7 @@ const Profile = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await deleteCustomer(customer.id);
+          await deleteOrder(order.id);
           MySwal.fire("Đã xóa!", "", "success");
           fetchData();
         } catch {
@@ -102,13 +116,12 @@ const Profile = () => {
   };
 
   const handleModalOk = async (values: any) => {
-    console.log("c", values);
     try {
       if (editData) {
-        await updateCustomer(editData.id, values);
+        await updateOrder(editData.id, values);
         message.success("Cập nhật thành công!");
       } else {
-        await createCustomer(values);
+        await createOrder(values);
         message.success("Tạo mới thành công!");
       }
       setModalOpen(false);
@@ -132,9 +145,9 @@ const Profile = () => {
           <div className="profile-filters">
             <input
               type="text"
-              placeholder="Title"
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
+              placeholder="Date VD: 2023-10-01"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
             />
             <Select
               allowClear
@@ -143,6 +156,17 @@ const Profile = () => {
               value={sort || undefined}
               onChange={(value) => setSort(value)}
               options={sortOptions}
+            />
+            <Select
+              allowClear
+              style={{ minWidth: 200 }}
+              placeholder="Lọc theo khách hàng"
+              value={customerId || undefined}
+              onChange={(value) => setCustomerId(value)}
+              options={customers.map((customer) => ({
+                label: customer.name,
+                value: customer.id,
+              }))}
             />
             <Select
               allowClear
@@ -166,10 +190,9 @@ const Profile = () => {
             <thead>
               <tr>
                 <th>ID</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Address</th>
+                <th>Date</th>
+                <th>Total</th>
+                <th>Customer</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -184,10 +207,9 @@ const Profile = () => {
                 data.map((item, idx) => (
                   <tr key={item.id || idx}>
                     <td>{item.id}</td>
-                    <td>{item.name}</td>
-                    <td>{item.email}</td>
-                    <td>{item.phone}</td>
-                    <td>{item.address}</td>
+                    <td>{new Date(item.order_date).toLocaleDateString()}</td>
+                    <td>{item.total_amount}</td>
+                    <td>{item.customer?.name}</td>
                     <td>
                       <div className="profile-actions">
                         <button
@@ -272,7 +294,7 @@ const Profile = () => {
           </button>
         </div>
       </main>
-      <ProfileModal
+      <OrderModal
         open={modalOpen}
         onOk={handleModalOk}
         onCancel={handleModalCancel}
@@ -282,4 +304,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default Order;

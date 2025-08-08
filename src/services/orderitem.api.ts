@@ -1,12 +1,13 @@
 import axiosInstance from "../utils/axiosInstance";
 
-export const getOrderItems = async (limit = 10, skip = 0, q = "", sort = "") => {
+export const getOrderItems = async (limit = 10, skip = 0, sort = "", product_id = "", order_id = "") => {
   const res = await axiosInstance.get("/orderitems", {
     params: {
       limit,
       skip,
-      q,
-      sort,
+      ...(sort ? { sort } : {}),
+      ...(product_id ? { product_id } : {}),
+      ...(order_id ? { order_id } : {}),
     },
   });
   return res.data;

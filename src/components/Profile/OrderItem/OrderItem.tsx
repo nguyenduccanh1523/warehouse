@@ -1,23 +1,33 @@
 import React, { useEffect, useState } from "react";
 import "antd/dist/reset.css";
-import "./profile.scss";
+import "../profile.scss";
 import {
-  getCustomers,
-  createCustomer,
-  updateCustomer,
-  deleteCustomer,
-} from "../../services/customer.api";
+  getOrderItems,
+  createOrderItem,
+  updateOrderItem,
+  deleteOrderItem,
+} from "../../../services/orderitem.api";
+import { getProducts } from "../../../services/product.api";
+import { getOrders } from "../../../services/order.api";
 import { message, Select } from "antd";
-import ProfileModal from "./ProfileModal";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
+import OrderItemModal from "./OrderItemModal";
 
-interface Customer {
+interface OrderItem {
   id: string;
-  name: string;
-  email: string;
-  phone: string;
-  address: string;
+  order_id: string;
+  product_id: string;
+  quantity: number;
+  price: number;
+  product?: {
+    id: string;
+    name: string;
+  };
+  order?: {
+    id: string;
+    name: string;
+  };
 }
 
 const PAGE_SIZE = 10;
@@ -27,39 +37,63 @@ const MySwal = withReactContent(Swal);
 const sortOptions = [
   { label: "ID ↑", value: "id" },
   { label: "ID ↓", value: "-id" },
-  { label: "Name ↑", value: "name" },
-  { label: "Name ↓", value: "-name" },
-  { label: "Email ↑", value: "email" },
-  { label: "Email ↓", value: "-email" },
-  { label: "Address ↑", value: "address" },
-  { label: "Address ↓", value: "-address" },
 ];
 
-const Profile = () => {
+const OrderItem = () => {
   const [total, setTotalPages] = useState(0);
   const [skip, setSkip] = useState(0);
   const [limit, setLimit] = useState(PAGE_SIZE);
-  const [q, setQ] = useState("");
   const [sort, setSort] = useState("");
-  const [data, setData] = useState<Customer[]>([]);
+  const [data, setData] = useState<OrderItem[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = Math.ceil(total / limit);
   const [modalOpen, setModalOpen] = useState(false);
-  const [editData, setEditData] = useState<Customer | null>(null);
+  const [editData, setEditData] = useState<OrderItem | null>(null);
+  const [products, setProducts] = useState<{ id: string; name: string }[]>([]);
+  const [productId, setProductId] = useState<string | undefined>(undefined);
+  const [orders, setOrders] = useState<{ id: string; name: string }[]>([]);
+  const [orderId, setOrderId] = useState<string | undefined>(undefined);
+
 
   const fetchData = async () => {
     try {
-      const result = await getCustomers(limit, skip, q, sort);
+      const result = await getOrderItems(
+        limit,
+        skip,
+        sort,
+        productId,
+        orderId
+      );
       setData(result.data || []);
       setTotalPages(result.total || 1);
     } catch (error) {
-      console.error("Error fetching customers:", error);
+      console.error("Error fetching order items:", error);
+    }
+  };
+
+  const fetchProducts = async () => {
+    try {
+      const result = await getProducts();
+      setProducts(result.data || []);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    }
+  };
+
+  const fetchOrders = async () => {
+    try {
+      const result = await getOrders();
+      setOrders(result.data || []);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
     }
   };
 
   useEffect(() => {
     fetchData();
-  }, [limit, skip, q, sort]);
+    fetchProducts();
+    fetchOrders();
+  }, [limit, skip, sort, productId, orderId]);
 
   const handlePageChange = (newPage: number) => {
     const newSkip = (newPage - 1) * limit;
@@ -68,21 +102,20 @@ const Profile = () => {
     fetchData();
   };
 
-
   const handleAddNew = () => {
     setEditData(null);
     setModalOpen(true);
   };
 
-  const handleEdit = (customer: Customer) => {
-    setEditData(customer);
+  const handleEdit = (orderItem: OrderItem) => {
+    setEditData(orderItem);
     setModalOpen(true);
   };
 
-  const handleDelete = (customer: Customer) => {
+  const handleDelete = (orderItem: OrderItem) => {
     MySwal.fire({
-      title: "Bạn có chắc muốn xóa khách hàng này?",
-      text: customer.name,
+      title: "Bạn có chắc muốn xóa sản phẩm này?",
+      text: orderItem.product?.name,
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Xóa",
@@ -91,7 +124,7 @@ const Profile = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await deleteCustomer(customer.id);
+          await deleteOrderItem(orderItem.id);
           MySwal.fire("Đã xóa!", "", "success");
           fetchData();
         } catch {
@@ -102,13 +135,12 @@ const Profile = () => {
   };
 
   const handleModalOk = async (values: any) => {
-    console.log("c", values);
     try {
       if (editData) {
-        await updateCustomer(editData.id, values);
+        await updateOrderItem(editData.id, values);
         message.success("Cập nhật thành công!");
       } else {
-        await createCustomer(values);
+        await createOrderItem(values);
         message.success("Tạo mới thành công!");
       }
       setModalOpen(false);
@@ -130,11 +162,16 @@ const Profile = () => {
             Add new
           </button>
           <div className="profile-filters">
-            <input
-              type="text"
-              placeholder="Title"
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
+            <Select
+              allowClear
+              style={{ minWidth: 200 }}
+              placeholder="Lọc theo đơn hàng"
+              value={orderId || undefined}
+              onChange={(value) => setOrderId(value)}
+              options={orders.map((order) => ({
+                label: order.name,
+                value: order.id,
+              }))}
             />
             <Select
               allowClear
@@ -143,6 +180,17 @@ const Profile = () => {
               value={sort || undefined}
               onChange={(value) => setSort(value)}
               options={sortOptions}
+            />
+            <Select
+              allowClear
+              style={{ minWidth: 200 }}
+              placeholder="Lọc theo sản phẩm"
+              value={productId || undefined}
+              onChange={(value) => setProductId(value)}
+              options={products.map((product) => ({
+                label: product.name,
+                value: product.id,
+              }))}
             />
             <Select
               allowClear
@@ -166,10 +214,10 @@ const Profile = () => {
             <thead>
               <tr>
                 <th>ID</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Address</th>
+                <th>Order</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Product</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -184,10 +232,10 @@ const Profile = () => {
                 data.map((item, idx) => (
                   <tr key={item.id || idx}>
                     <td>{item.id}</td>
-                    <td>{item.name}</td>
-                    <td>{item.email}</td>
-                    <td>{item.phone}</td>
-                    <td>{item.address}</td>
+                    <td>{item.order_id}</td>
+                    <td>{item.quantity}</td>
+                    <td>{item.price}</td>
+                    <td>{item.product?.name}</td>
                     <td>
                       <div className="profile-actions">
                         <button
@@ -272,7 +320,7 @@ const Profile = () => {
           </button>
         </div>
       </main>
-      <ProfileModal
+      <OrderItemModal
         open={modalOpen}
         onOk={handleModalOk}
         onCancel={handleModalCancel}
@@ -282,4 +330,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default OrderItem;
