@@ -32,6 +32,7 @@ const sortOptions = [
   { label: "Address ↓", value: "-address" },
 ];
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 const Supplier = () => {
   const [total, setTotalPages] = useState(0);
   const [skip, setSkip] = useState(0);
@@ -56,6 +57,7 @@ const Supplier = () => {
 
   useEffect(() => {
     fetchData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [limit, skip, q, sort]);
 
   const handlePageChange = (newPage: number) => {

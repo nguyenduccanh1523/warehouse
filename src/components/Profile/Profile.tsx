@@ -59,6 +59,7 @@ const Profile = () => {
 
   useEffect(() => {
     fetchData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [limit, skip, q, sort]);
 
   const handlePageChange = (newPage: number) => {

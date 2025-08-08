@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Modal, Form, Input, Select, DatePicker } from "antd";
+import { Modal, Form, Select, DatePicker } from "antd";
 import { getCustomers } from "../../../services/customer.api";
 import dayjs from "dayjs";
 

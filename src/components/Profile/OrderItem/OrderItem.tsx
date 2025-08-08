@@ -39,6 +39,7 @@ const sortOptions = [
   { label: "ID ↓", value: "-id" },
 ];
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 const OrderItem = () => {
   const [total, setTotalPages] = useState(0);
   const [skip, setSkip] = useState(0);
@@ -93,6 +94,7 @@ const OrderItem = () => {
     fetchData();
     fetchProducts();
     fetchOrders();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [limit, skip, sort, productId, orderId]);
 
   const handlePageChange = (newPage: number) => {

@@ -37,6 +37,7 @@ const sortOptions = [
   { label: "Total Amount ↓", value: "-total_amount" },
 ];
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 const Order = () => {
   const [total, setTotalPages] = useState(0);
   const [skip, setSkip] = useState(0);
@@ -74,6 +75,7 @@ const Order = () => {
   useEffect(() => {
     fetchData();
     fetchCustomers();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [limit, skip, date, sort, customerId]);
 
   const handlePageChange = (newPage: number) => {

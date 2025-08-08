@@ -40,6 +40,7 @@ const sortOptions = [
   { label: "Price ↓", value: "-price" },
 ];
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 const Product = () => {
   const [total, setTotalPages] = useState(0);
   const [skip, setSkip] = useState(0);
@@ -77,6 +78,7 @@ const Product = () => {
   useEffect(() => {
     fetchData();
     fetchSuppliers();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [limit, skip, q, sort, supplierId]);
 
   const handlePageChange = (newPage: number) => {
